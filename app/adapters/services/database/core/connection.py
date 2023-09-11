@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, Awaitable, ParamSpec, TypeVar
+from typing import Annotated, AsyncGenerator, Awaitable, ParamSpec, TypeVar
 from collections.abc import Callable
 
 from sqlalchemy.ext.asyncio import (
@@ -45,4 +45,6 @@ class CreateSession:
             yield session
 
 
-async_session: AsyncSession = CreateSession(load_settings.db_url)
+async_session: Annotated[AsyncSession, CreateSession] = CreateSession(
+    load_settings.db_url
+)
