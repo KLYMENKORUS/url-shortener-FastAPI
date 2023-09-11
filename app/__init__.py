@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from api import Server
+from app.api import Server
 
 
 def create_app(_=None) -> FastAPI:

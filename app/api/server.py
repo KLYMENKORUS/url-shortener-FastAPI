@@ -2,7 +2,7 @@ from typing import ClassVar, Type
 
 from fastapi import FastAPI
 
-from api.core import __routers__
+from app.api.core import __routers__
 
 
 class Server:

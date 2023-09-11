@@ -1,0 +1,33 @@
+version: "3.0"
+services:
+  db:
+    container_name: "url-short"
+    image: postgres:14.1-alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5434:5432"
+    networks:
+      - custom
+
+  api:
+    build:
+      context: .
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/fastapi_app
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+    command: bash -c "poetry run uvicorn app:create_app --host 0.0.0.0 --port 8000 --reload"
+
+networks:
+  custom:
+volumes:
+  fastapi_app:
