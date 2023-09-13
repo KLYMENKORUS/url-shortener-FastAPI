@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -26,6 +27,7 @@ class URL(URLBase):
 
 
 class URLInfo(URL):
+    id: uuid.UUID
     short_url: str
 
 

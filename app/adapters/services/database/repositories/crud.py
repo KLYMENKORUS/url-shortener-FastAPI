@@ -32,10 +32,8 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         stmt = insert(self.model).values(**kwargs).returning(self.model)
         return (await self._session.execute(stmt)).scalars().first()
 
-    async def select(
-        self, field: str, value: ColumnElement[bool]
-    ) -> Model | None:
-        stmt = select(self.model).filter_by(**{field: value})
+    async def select(self, **kwargs: dict[str, Any]) -> Model | None:
+        stmt = select(self.model).filter_by(**kwargs)
         return (await self._session.execute(stmt)).scalars().first()
 
     async def update(

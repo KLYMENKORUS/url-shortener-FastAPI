@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Type
+from typing import ClassVar, List, Optional, Type, Any
 
 from app.api.common.database.interfaces.repositories import Repository
 from app.api.common.schemas import URLInfo, URLCreate, URLUpdate
@@ -9,7 +9,8 @@ from .base import BaseRepository
 
 
 class URLRepository(
-    BaseRepository, Repository[str, str, URLInfo, URLCreate, URLUpdate]
+    BaseRepository,
+    Repository[str, dict[str, Any], URLInfo, URLCreate, URLUpdate],
 ):
     model: ClassVar[Type[URL]] = URL
 
@@ -18,8 +19,8 @@ class URLRepository(
 
         return convert_url_model_to_dto(result)
 
-    async def select(self, field: str, value: str) -> URLInfo | None:
-        result = await self._crud.select(field, value)
+    async def select(self, **kwargs: dict[str, Any]) -> URLInfo | None:
+        result = await self._crud.select(**kwargs)
 
         if result is None:
             return None

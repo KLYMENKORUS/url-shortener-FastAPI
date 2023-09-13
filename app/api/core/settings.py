@@ -11,6 +11,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    base_url: str = "http://127.0.0.1:8000/"
     database_uri: str = (
         "postgresql+asyncpg://{}:{}@{}:{}/{}?async_fallback=True"
     )

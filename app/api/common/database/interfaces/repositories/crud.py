@@ -21,9 +21,7 @@ class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def select(
-        self, field: str, value: ColumnElement[bool]
-    ) -> Optional[EntryType]:
+    async def select(self, **kwargs: dict[str, Any]) -> Optional[EntryType]:
         raise NotImplementedError
 
     @abc.abstractmethod
