@@ -1,8 +1,10 @@
 __all__ = (
     "AbstractUnitOfWork",
-    "BaseRepository",
-    "AbstractCRUDRepository",
+    # "Repository",
+    # "AbstractCRUDRepository",
 )
 
 from .interfaces.unit_of_work import AbstractUnitOfWork
-from .interfaces.repositories import BaseRepository, AbstractCRUDRepository
+
+# from .interfaces.repositories.crud import AbstractCRUDRepository
+# from .interfaces.repositories.base import Repository

@@ -1,7 +1,7 @@
 __all__ = (
-    "BaseRepository",
+    "Repository",
     "AbstractCRUDRepository",
 )
 
-from .base import BaseRepository
+from .base import Repository
 from .crud import AbstractCRUDRepository

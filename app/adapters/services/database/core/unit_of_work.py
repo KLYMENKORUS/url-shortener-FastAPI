@@ -1,6 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.api import CommitError, RollbackError
+from app.adapters.utils.exceptions import CommitError, RollbackError
 from app.api.common.database import AbstractUnitOfWork
 
 

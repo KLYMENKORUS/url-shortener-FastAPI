@@ -20,7 +20,7 @@ class URL(Base, ModelWithUUID, ModelWithTime):
         Boolean,
         default=True,
     )
-    cliks: Mapped[int] = mapped_column(
+    clicks: Mapped[int] = mapped_column(
         Integer,
-        default=True,
+        default=0,
     )

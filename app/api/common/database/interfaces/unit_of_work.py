@@ -6,16 +6,22 @@ from types import TracebackType
 
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncSessionTransaction
 
-from app.adapters import async_session
+from app.adapters.services.database.core import async_session
+
+from .mediator import build_mediator, Mediator
 
 
 class AbstractUnitOfWork(abc.ABC):
     def __init__(self) -> None:
-        self._session: AsyncSession = async_session()
+        self._session_factory = async_session
         self._session_transaction: Optional[AsyncSessionTransaction] = None
 
     async def __aenter__(self) -> Type["AbstractUnitOfWork"]:
+        self._session: AsyncSession = await self._session_factory()
         await self._create_transaction()
+
+        self._mediator: Type[Mediator] = build_mediator(self._session)
+
         return self
 
     async def __aexit__(
@@ -34,7 +40,7 @@ class AbstractUnitOfWork(abc.ABC):
 
     async def _create_transaction(self) -> None:
         if not self._session.in_transaction() and self._session.is_active:
-            self._session_transaction = self._session.begin()
+            self._session_transaction = await self._session.begin()
 
     @abc.abstractmethod
     async def commit(self) -> None:

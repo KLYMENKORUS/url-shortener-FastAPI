@@ -14,7 +14,9 @@ from sqlalchemy import (
     ColumnElement,
 )
 
-from app.api.common.database import AbstractCRUDRepository
+from app.api.common.database.interfaces.repositories import (
+    AbstractCRUDRepository,
+)
 from app.adapters import Base
 
 
@@ -30,8 +32,10 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         stmt = insert(self.model).values(**kwargs).returning(self.model)
         return (await self._session.execute(stmt)).scalars().first()
 
-    async def select(self, *clauses: ColumnElement[bool]) -> Model | None:
-        stmt = select(self.model).where(*clauses)
+    async def select(
+        self, field: str, value: ColumnElement[bool]
+    ) -> Model | None:
+        stmt = select(self.model).filter_by(**{field: value})
         return (await self._session.execute(stmt)).scalars().first()
 
     async def update(

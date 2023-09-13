@@ -5,18 +5,19 @@ from pydantic import BaseModel
 
 
 T = TypeVar("T", bound=Any)
+F = TypeVar("F", bound=Any)
 Q = TypeVar("Q", bound=BaseModel, contravariant=True)
 U = TypeVar("U", bound=BaseModel, contravariant=True)
 TypeValue = TypeVar("TypeValue", contravariant=True)
 
 
-class BaseRepository(Protocol, Generic[TypeValue, T, Q, U]):
+class Repository(Protocol, Generic[TypeValue, F, T, Q, U]):
     @abc.abstractmethod
     async def create(self, query: Q) -> Optional[T]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def select(self, value: TypeValue) -> Optional[T]:
+    async def select(self, field: F, value: TypeValue) -> Optional[T]:
         raise NotImplementedError
 
     @abc.abstractmethod

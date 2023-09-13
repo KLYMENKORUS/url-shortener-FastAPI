@@ -1,4 +1,6 @@
-from typing import Annotated, AsyncGenerator, Awaitable, ParamSpec, TypeVar
+from typing import Optional
+
+from typing import Annotated, Awaitable, ParamSpec, TypeVar
 from collections.abc import Callable
 
 from sqlalchemy.ext.asyncio import (
@@ -8,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine,
 )
 
-from app.api import load_settings
+from app.api.core.settings import load_settings
 
 
 P = ParamSpec("P")
@@ -39,10 +41,13 @@ class CreateSession:
             class_=AsyncSession,
         )
 
-    async def _async_session(self) -> AsyncGenerator[AsyncSession, None]:
-        """Dependency for getting async setting"""
-        async with self._create_session_factory() as session:
-            yield session
+    async def _async_session(
+        self,
+        session_factory: Optional[async_sessionmaker[AsyncSession]] = None,
+    ) -> AsyncSession:
+        if session_factory is None:
+            session_factory = await self._create_session_factory()
+        return session_factory()
 
 
 async_session: Annotated[AsyncSession, CreateSession] = CreateSession(

@@ -1,4 +1,9 @@
-from .routers import Routers
-from app.api import router
+__all__ = ("load_settings",)
 
-__routers__: Routers = Routers(routers=(router,))
+from .settings import load_settings
+
+
+from .routers import Routers
+from app.api.routers.url import router as router_url
+
+__routers__: Routers = Routers(routers=(router_url,))
