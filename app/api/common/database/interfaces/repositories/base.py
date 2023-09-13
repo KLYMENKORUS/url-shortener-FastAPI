@@ -17,13 +17,11 @@ class Repository(Protocol, Generic[TypeValue, D, T, Q, U]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def select(self, kwargs: D) -> Optional[T]:
+    async def select(self, **kwargs: D) -> Optional[T]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def update(
-        self, value: TypeValue, query: U, exclude_none: bool = True
-    ) -> List[T]:
+    async def update(self, value: TypeValue, **query: U) -> T:
         raise NotImplementedError
 
     @abc.abstractmethod

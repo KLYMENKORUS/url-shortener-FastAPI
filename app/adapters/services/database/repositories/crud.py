@@ -38,7 +38,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
 
     async def update(
         self, *clauses: ColumnElement[bool], **kwargs: dict[str, Any]
-    ) -> Sequence[Model]:
+    ) -> Model:
         stmt = (
             update(self.model)
             .where(*clauses)
@@ -46,7 +46,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
             .returning(self.model)
         )
 
-        return (await self._session.execute(stmt)).scalars().all()
+        return (await self._session.execute(stmt)).scalars().first()
 
     async def delete(self, *clauses: ColumnElement[bool]) -> Sequence[Model]:
         stmt = delete(self.model).where(*clauses).returning(self.model)

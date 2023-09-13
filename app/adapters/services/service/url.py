@@ -44,7 +44,12 @@ class URLService:
             if forward_url := await uow.url_repo.select(
                 key=key, is_active=URL.is_active
             ):
-                return forward_url.target_url
+                update_clicks = await uow.url_repo.update(
+                    URL.is_active == forward_url.is_active,
+                    clicks=forward_url.clicks + 1,
+                )
+
+                return update_clicks.target_url
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,

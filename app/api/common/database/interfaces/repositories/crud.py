@@ -27,7 +27,7 @@ class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
     @abc.abstractmethod
     async def update(
         self, *clauses: ColumnElement[bool], **kwargs: dict[str, Any]
-    ) -> Sequence[EntryType]:
+    ) -> EntryType:
         raise NotImplementedError
 
     @abc.abstractmethod

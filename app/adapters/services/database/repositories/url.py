@@ -1,16 +1,15 @@
-from typing import ClassVar, List, Optional, Type, Any
+from typing import ClassVar, List, Type, Any
 
 from app.api.common.database.interfaces.repositories import Repository
 from app.api.common.schemas import URLInfo, URLCreate, URLUpdate
 from app.adapters import URL
 from app.adapters.utils.converters import convert_url_model_to_dto
-from app.api.common.schemas.url import URLUpdate
 from .base import BaseRepository
 
 
 class URLRepository(
     BaseRepository,
-    Repository[str, dict[str, Any], URLInfo, URLCreate, URLUpdate],
+    Repository[str, dict[str, Any], URLInfo, URLCreate, dict[str, URL]],
 ):
     model: ClassVar[Type[URL]] = URL
 
@@ -27,10 +26,8 @@ class URLRepository(
 
         return convert_url_model_to_dto(result)
 
-    async def update(
-        self, value: str, query: URLUpdate, exclude_none: bool = True
-    ) -> List[URLInfo]:
-        return await super().update(value, query, exclude_none)
+    async def update(self, value: str, **query: dict[str, URL]) -> URLInfo:
+        return await self._crud.update(value, **query)
 
     async def delete(self, value: str) -> List[URLInfo]:
         return await super().delete(value)
