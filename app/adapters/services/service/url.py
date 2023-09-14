@@ -16,6 +16,10 @@ class URLService:
     random_key: ClassVar[Type[CreateRandomKey]] = CreateRandomKey()
 
     @classmethod
+    def _exception_url(cls, message: str, status_code: int) -> HTTPException:
+        raise HTTPException(status_code=status_code, detail=message)
+
+    @classmethod
     @validator_url
     async def create(
         cls, uow: Type[DatabaseUOW], query: URLBase
@@ -31,9 +35,22 @@ class URLService:
 
                 return convert_key_to_short_url(result)
             else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Url {query.target_url} already exists",
+                cls._exception_url(
+                    f"Url {query.target_url} already exists",
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+    @classmethod
+    async def select(cls, uow: Type[DatabaseUOW], key: str) -> URLInfo | None:
+        async with uow:
+            if get_url := await uow.url_repo.select(
+                key=key, is_active=URL.is_active
+            ):
+                return convert_key_to_short_url(get_url)
+            else:
+                cls._exception_url(
+                    f"Url with key {key} is not found",
+                    status.HTTP_404_NOT_FOUND,
                 )
 
     @classmethod
@@ -51,7 +68,7 @@ class URLService:
 
                 return update_clicks.target_url
             else:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Url with key {key} is not found",
+                cls._exception_url(
+                    f"Url with key {key} is not found",
+                    status.HTTP_404_NOT_FOUND,
                 )

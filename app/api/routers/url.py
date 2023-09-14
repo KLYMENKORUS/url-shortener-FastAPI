@@ -6,7 +6,7 @@ from app.adapters.dependencies import UOWDepends
 from app.adapters.services.service import URLService
 
 
-router = APIRouter(prefix="/url", tags=["url"])
+router = APIRouter(tags=["url"])
 
 
 @router.post(
@@ -16,6 +16,15 @@ router = APIRouter(prefix="/url", tags=["url"])
 )
 async def add_url(url: URLBase, uow: UOWDepends) -> URLInfo:
     return await URLService.create(uow, url)
+
+
+@router.get(
+    "/select/{url_key}",
+    summary="Getting a URL information",
+    response_model=URLInfo,
+)
+async def select(url_key: str, uow: UOWDepends):
+    return await URLService.select(uow, url_key)
 
 
 @router.get(
