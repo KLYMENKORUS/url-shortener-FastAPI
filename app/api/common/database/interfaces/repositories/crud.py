@@ -10,6 +10,7 @@ from typing import (
 from sqlalchemy import ColumnElement
 
 EntryType = TypeVar("EntryType")
+EntryTypeUOW = TypeVar("EntryTypeUOW")
 
 
 class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
@@ -34,4 +35,27 @@ class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
     async def delete(
         self, *clauses: ColumnElement[bool]
     ) -> Sequence[EntryType]:
+        raise NotImplementedError
+
+
+class AbstractCRUDService(abc.ABC, Generic[EntryTypeUOW]):
+    def __init__(self, uow: Type[EntryTypeUOW]) -> None:
+        self.uow = uow
+
+    @abc.abstractmethod
+    async def create(
+        self, field: str, value: Any, **kwargs: dict[str, Any]
+    ) -> Optional[Any]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def select(self, value: str) -> Optional[Any]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def update(self, **kwargs: dict[str, Any]) -> Any:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def delete(self, value: str) -> Any:
         raise NotImplementedError
