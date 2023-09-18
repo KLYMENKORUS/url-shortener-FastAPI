@@ -32,4 +32,4 @@ class URLInfo(URL):
 
 
 class URLUpdate(URLBase):
-    short_url: str
+    key: str
