@@ -1,5 +1,5 @@
 import abc
-from typing import Any, TypeVar, Optional, List, Protocol, Generic, Dict
+from typing import Any, TypeVar, Optional, Protocol, Generic, Dict
 
 from pydantic import BaseModel
 from sqlalchemy import ColumnElement
@@ -13,7 +13,7 @@ U = TypeVar("U", bound=BaseModel, contravariant=True)
 TypeValue = TypeVar("TypeValue", contravariant=True)
 
 
-class Repository(Protocol, Generic[TypeValue, D, T, Q, U, C]):
+class Repository(Protocol, Generic[D, T, Q, U, C]):
     @abc.abstractmethod
     async def create(self, query: Q) -> Optional[T]:
         raise NotImplementedError
@@ -27,11 +27,11 @@ class Repository(Protocol, Generic[TypeValue, D, T, Q, U, C]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def delete(self, value: TypeValue) -> List[T]:
+    async def delete(self, *clauses: C) -> T:
         raise NotImplementedError
 
 
-class Service(Protocol, Generic[TypeValue, T, Q, U, C]):
+class Service(Protocol, Generic[TypeValue, T, Q]):
     @abc.abstractmethod
     async def create(self, query: Q) -> Optional[T]:
         raise NotImplementedError
@@ -41,9 +41,5 @@ class Service(Protocol, Generic[TypeValue, T, Q, U, C]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def update(self, *clauses: C, **query: U) -> T:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def delete(self, value: TypeValue) -> List[T]:
+    async def delete(self, value: TypeValue) -> T:
         raise NotImplementedError

@@ -36,3 +36,10 @@ async def forward_to_target_url(
     url_key: str, uow: UOWDepends
 ) -> RedirectResponse:
     return await URLService(uow).forward_to_target_url(url_key)
+
+
+@router.delete("/delete/{url_key}", summary="Delete a shortened URL")
+async def delete_url(url_key: str, uow: UOWDepends) -> dict[str, str]:
+    await URLService(uow).delete(url_key)
+
+    return {"status": "success"}

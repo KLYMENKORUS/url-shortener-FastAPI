@@ -1,5 +1,9 @@
 from typing import Type
 
+from sqlalchemy import ColumnElement
+
+from app.api.common.schemas.url import URLInfo
+
 from ..database.core import DatabaseUOW
 from ...utils.decorators import validator_url
 from ...utils.keygen import CreateRandomKey
@@ -32,6 +36,11 @@ class URLService(BaseService, Service[str, URLInfo, URLBase]):
     async def select(self, value: str) -> URLInfo | None:
         result = await self._service.select(key=value, is_active=True)
         return convert_key_to_short_url(result)
+
+    async def delete(self, value: str) -> URLInfo:
+        return await self._service.delete(
+            "key", value, URL.key == value, URL.is_active == True
+        )
 
     async def forward_to_target_url(self, key: str) -> str | None:
         forward_url = await self._service.select(key=key, is_active=True)

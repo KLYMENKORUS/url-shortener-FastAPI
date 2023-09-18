@@ -1,9 +1,9 @@
-from typing import ClassVar, List, Type, Any
+from typing import ClassVar, Type, Any
 
 from sqlalchemy import ColumnElement
 
 from app.api.common.database.interfaces.repositories import Repository
-from app.api.common.schemas import URLInfo, URLCreate, URLUpdate
+from app.api.common.schemas import URLInfo, URLCreate
 from app.adapters import URL
 from app.adapters.utils.converters import convert_url_model_to_dto
 from .base import BaseRepository
@@ -12,7 +12,6 @@ from .base import BaseRepository
 class URLRepository(
     BaseRepository,
     Repository[
-        str,
         dict[str, Any],
         URLInfo,
         URLCreate,
@@ -40,5 +39,5 @@ class URLRepository(
     ) -> URLInfo:
         return await self._crud.update(*clauses, **query)
 
-    async def delete(self, value: str) -> List[URLInfo]:
-        return await super().delete(value)
+    async def delete(self, *clauses: ColumnElement[bool]) -> URLInfo:
+        return await self._crud.delete(*clauses)

@@ -4,7 +4,6 @@ from typing import (
     Generic,
     Optional,
     Type,
-    Sequence,
     TypeVar,
 )
 from sqlalchemy import ColumnElement
@@ -32,9 +31,7 @@ class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def delete(
-        self, *clauses: ColumnElement[bool]
-    ) -> Sequence[EntryType]:
+    async def delete(self, *clauses: ColumnElement[bool]) -> EntryType:
         raise NotImplementedError
 
 

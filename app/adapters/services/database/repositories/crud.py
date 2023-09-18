@@ -2,7 +2,6 @@ from typing import (
     Any,
     TypeVar,
     Type,
-    Sequence,
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,9 +52,9 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
 
         return (await self._session.execute(stmt)).scalars().first()
 
-    async def delete(self, *clauses: ColumnElement[bool]) -> Sequence[Model]:
+    async def delete(self, *clauses: ColumnElement[bool]) -> Model:
         stmt = delete(self.model).where(*clauses).returning(self.model)
-        return (await self._session.execute(stmt)).scalars().all()
+        return (await self._session.execute(stmt)).scalars().first()
 
 
 class CRUDService(AbstractCRUDService[UOW]):
@@ -106,5 +105,15 @@ class CRUDService(AbstractCRUDService[UOW]):
 
             return await self._repository.update(*clauses, **kwargs)
 
-    async def delete(self, value: str) -> Any:
-        return await super().delete(value)
+    async def delete(
+        self, field: str, value: Any, *clauses: ColumnElement[bool]
+    ) -> Any:
+        async with self.uow:
+            self._repository = getattr(self.uow, self._repository_name)
+            if not await self._repository.select(**{field: value}):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"The key {value} does not exist",
+                )
+
+            return await self._repository.delete(*clauses)
