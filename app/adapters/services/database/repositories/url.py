@@ -11,7 +11,14 @@ from .base import BaseRepository
 
 class URLRepository(
     BaseRepository,
-    Repository[str, dict[str, Any], URLInfo, URLCreate, dict[str, URL]],
+    Repository[
+        str,
+        dict[str, Any],
+        URLInfo,
+        URLCreate,
+        dict[str, URL],
+        ColumnElement[bool],
+    ],
 ):
     model: ClassVar[Type[URL]] = URL
 

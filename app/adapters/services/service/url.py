@@ -6,10 +6,11 @@ from ...utils.keygen import CreateRandomKey
 from ...utils.converters import convert_key_to_short_url
 from ..database.repositories import BaseService
 from app.api.common.schemas import URLBase, URLInfo, URLUpdate, URLCreate
+from app.api.common.database.interfaces.repositories import Service
 from app.adapters import URL
 
 
-class URLService(BaseService):
+class URLService(BaseService, Service[str, URLInfo, URLBase]):
     def __init__(self, uow: Type[DatabaseUOW]) -> None:
         super(URLService, self).__init__(uow, "url_repo")
         self.random_key: Type[CreateRandomKey] = CreateRandomKey()
@@ -28,8 +29,8 @@ class URLService(BaseService):
         )
         return convert_key_to_short_url(result)
 
-    async def select(self, key: str) -> URLInfo | None:
-        result = await self._service.select(key=key, is_active=True)
+    async def select(self, value: str) -> URLInfo | None:
+        result = await self._service.select(key=value, is_active=True)
         return convert_key_to_short_url(result)
 
     async def forward_to_target_url(self, key: str) -> str | None:

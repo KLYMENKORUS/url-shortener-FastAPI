@@ -2,16 +2,18 @@ import abc
 from typing import Any, TypeVar, Optional, List, Protocol, Generic, Dict
 
 from pydantic import BaseModel
+from sqlalchemy import ColumnElement
 
 
 T = TypeVar("T", bound=Any)
 D = TypeVar("D", bound=Dict)
+C = TypeVar("C", bound=ColumnElement)
 Q = TypeVar("Q", bound=BaseModel, contravariant=True)
 U = TypeVar("U", bound=BaseModel, contravariant=True)
 TypeValue = TypeVar("TypeValue", contravariant=True)
 
 
-class Repository(Protocol, Generic[TypeValue, D, T, Q, U]):
+class Repository(Protocol, Generic[TypeValue, D, T, Q, U, C]):
     @abc.abstractmethod
     async def create(self, query: Q) -> Optional[T]:
         raise NotImplementedError
@@ -21,7 +23,25 @@ class Repository(Protocol, Generic[TypeValue, D, T, Q, U]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def update(self, value: TypeValue, **query: U) -> T:
+    async def update(self, *clauses: C, **query: U) -> T:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def delete(self, value: TypeValue) -> List[T]:
+        raise NotImplementedError
+
+
+class Service(Protocol, Generic[TypeValue, T, Q, U, C]):
+    @abc.abstractmethod
+    async def create(self, query: Q) -> Optional[T]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def select(self, value: TypeValue) -> Optional[T]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def update(self, *clauses: C, **query: U) -> T:
         raise NotImplementedError
 
     @abc.abstractmethod
