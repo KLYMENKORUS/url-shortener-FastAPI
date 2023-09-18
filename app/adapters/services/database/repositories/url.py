@@ -1,5 +1,7 @@
 from typing import ClassVar, List, Type, Any
 
+from sqlalchemy import ColumnElement
+
 from app.api.common.database.interfaces.repositories import Repository
 from app.api.common.schemas import URLInfo, URLCreate, URLUpdate
 from app.adapters import URL
@@ -26,8 +28,10 @@ class URLRepository(
 
         return convert_url_model_to_dto(result)
 
-    async def update(self, value: str, **query: dict[str, URL]) -> URLInfo:
-        return await self._crud.update(value, **query)
+    async def update(
+        self, *clauses: ColumnElement[bool], **query: dict[str, URL]
+    ) -> URLInfo:
+        return await self._crud.update(*clauses, **query)
 
     async def delete(self, value: str) -> List[URLInfo]:
         return await super().delete(value)

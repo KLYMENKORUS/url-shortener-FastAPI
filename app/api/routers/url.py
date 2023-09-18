@@ -15,7 +15,7 @@ router = APIRouter(tags=["url"])
     response_model=URLInfo,
 )
 async def add_url(url: URLBase, uow: UOWDepends) -> URLInfo:
-    return await URLService.create(uow, url)
+    return await URLService(uow).create(url)
 
 
 @router.get(
@@ -24,7 +24,7 @@ async def add_url(url: URLBase, uow: UOWDepends) -> URLInfo:
     response_model=URLInfo,
 )
 async def select(url_key: str, uow: UOWDepends):
-    return await URLService.select(uow, url_key)
+    return await URLService(uow).select(url_key)
 
 
 @router.get(
@@ -35,4 +35,4 @@ async def select(url_key: str, uow: UOWDepends):
 async def forward_to_target_url(
     url_key: str, uow: UOWDepends
 ) -> RedirectResponse:
-    return await URLService.forward_to_target_url(uow, url_key)
+    return await URLService(uow).forward_to_target_url(url_key)

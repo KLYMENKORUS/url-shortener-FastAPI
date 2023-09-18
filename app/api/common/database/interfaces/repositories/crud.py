@@ -49,11 +49,17 @@ class AbstractCRUDService(abc.ABC, Generic[EntryTypeUOW]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def select(self, value: str) -> Optional[Any]:
+    async def select(self, **kwargs: dict[str, Any]) -> Optional[Any]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def update(self, **kwargs: dict[str, Any]) -> Any:
+    async def update(
+        self,
+        field: str,
+        value: Any,
+        *clauses: ColumnElement[bool],
+        **kwargs: dict[str, Any]
+    ) -> Any:
         raise NotImplementedError
 
     @abc.abstractmethod

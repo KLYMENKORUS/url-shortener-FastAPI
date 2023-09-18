@@ -61,26 +61,50 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
 class CRUDService(AbstractCRUDService[UOW]):
     def __init__(self, uow: Type[UOW], repository: str) -> None:
         super().__init__(uow)
-        self._repository = repository
+        self._repository_name = repository
 
     async def create(
         self, field: str, value: Any, kwargs: Type[ModelBase]
     ) -> Any | None:
         async with self.uow:
-            self._repository = getattr(self.uow, self._repository)
+            self._repository = getattr(self.uow, self._repository_name)
             if not await self._repository.select(**{field: value}):
                 return await self._repository.create(kwargs)
-            else:
+
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The {value} already exists",
+            )
+
+    async def select(self, **kwargs: dict[str, Any]) -> Any | None:
+        async with self.uow:
+            self._repository = getattr(self.uow, self._repository_name)
+            data = await self._repository.select(**kwargs)
+
+            if data is None:
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"The {value} already exists",
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="The does not exist",
                 )
 
-    async def select(self, value: str) -> Any | None:
-        return await super().select(value)
+            return data
 
-    async def update(self, **kwargs: dict[str, Any]) -> Any:
-        return await super().update(**kwargs)
+    async def update(
+        self,
+        field: str,
+        value: Any,
+        *clauses: ColumnElement[bool],
+        **kwargs: dict[str, Any],
+    ) -> Any:
+        async with self.uow:
+            self._repository = getattr(self.uow, self._repository_name)
+            if not await self._repository.select(**{field: value}):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"The key {value} does not exist",
+                )
+
+            return await self._repository.update(*clauses, **kwargs)
 
     async def delete(self, value: str) -> Any:
         return await super().delete(value)
