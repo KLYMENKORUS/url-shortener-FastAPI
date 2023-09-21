@@ -1,15 +1,11 @@
 from typing import Type
 
-from sqlalchemy import ColumnElement
-
-from app.api.common.schemas.url import URLInfo
-
 from ..database.core import DatabaseUOW
 from ...utils.decorators import validator_url
 from ...utils.keygen import CreateRandomKey
 from ...utils.converters import convert_key_to_short_url
 from ..database.repositories import BaseService
-from app.api.common.schemas import URLBase, URLInfo, URLUpdate, URLCreate
+from app.api.common.schemas import URLBase, URLInfo, URLCreate
 from app.api.common.database.interfaces.repositories import Service
 from app.adapters import URL
 

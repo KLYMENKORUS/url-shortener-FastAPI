@@ -2,7 +2,9 @@ from typing import (
     Any,
     TypeVar,
     Type,
+    AsyncGenerator,
 )
+from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
@@ -62,11 +64,18 @@ class CRUDService(AbstractCRUDService[UOW]):
         super().__init__(uow)
         self._repository_name = repository
 
+    @asynccontextmanager
+    async def repository_context(
+        self,
+    ) -> AsyncGenerator[Type[CRUDRepository], None]:
+        async with self.uow:
+            self._repository = getattr(self.uow, self._repository_name)
+            yield self._repository
+
     async def create(
         self, field: str, value: Any, kwargs: Type[ModelBase]
     ) -> Any | None:
-        async with self.uow:
-            self._repository = getattr(self.uow, self._repository_name)
+        async with self.repository_context():
             if not await self._repository.select(**{field: value}):
                 return await self._repository.create(kwargs)
 
@@ -76,8 +85,7 @@ class CRUDService(AbstractCRUDService[UOW]):
             )
 
     async def select(self, **kwargs: dict[str, Any]) -> Any | None:
-        async with self.uow:
-            self._repository = getattr(self.uow, self._repository_name)
+        async with self.repository_context():
             data = await self._repository.select(**kwargs)
 
             if data is None:
@@ -95,8 +103,7 @@ class CRUDService(AbstractCRUDService[UOW]):
         *clauses: ColumnElement[bool],
         **kwargs: dict[str, Any],
     ) -> Any:
-        async with self.uow:
-            self._repository = getattr(self.uow, self._repository_name)
+        async with self.repository_context():
             if not await self._repository.select(**{field: value}):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -108,8 +115,7 @@ class CRUDService(AbstractCRUDService[UOW]):
     async def delete(
         self, field: str, value: Any, *clauses: ColumnElement[bool]
     ) -> Any:
-        async with self.uow:
-            self._repository = getattr(self.uow, self._repository_name)
+        async with self.repository_context():
             if not await self._repository.select(**{field: value}):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
